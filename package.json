@@ -1,30 +1,37 @@
 {
-  "name": "paintformacos",
-  "version": "0.0.1",
-  "description": "Simple paint program for macos",
-  "main": "./src/main.js",
-  "scripts": {
-    "start": "electron ./src/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "macos-paint-react",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "p5": "^0.5.16",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-scripts": "1.0.14"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/pmpbar/paintformacos.git"
-  },
-  "keywords": [
-    "mspaint",
-    "macos",
-    "paint",
-    "p5",
-    "p5.js"
-  ],
-  "author": "Taylor Bartlett",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/pmpbar/paintformacos/issues"
-  },
-  "homepage": "https://github.com/pmpbar/paintformacos#readme",
   "devDependencies": {
-    "electron": "^1.4.1"
+    "electron": "^1.7.9",
+    "electron-builder": "^19.37.2",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.1.0",
+    "node-sass-chokidar": "^0.0.3",
+    "npm-run-all": "^4.0.2"
+  },
+  "main": "src/electron-starter.js",
+  "scripts": {
+    "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/",
+    "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
+    "start-js": "react-scripts start",
+    "start": "npm-run-all -p watch-css start-js",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron-start": "node src/electron-wait-react",
+    "react-start": "react-scripts start",
+    "pack": "build --dir",
+    "dist": "npm run build && build",
+    "postinstall": "install-app-deps"
   }
 }
