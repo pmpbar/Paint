@@ -5,9 +5,10 @@ MS paint for macOS. It is highly unfinished and will need some work. If you have
 ## Starting the app
 In order to start the application:
 ```bash
-$ npm i
-$ electron .
+$ yarn install
+$ yarn start
+(in seperate terminal)
+$ yarn electron-start
 ```
-
 ## Production
-[I should fill this out when it is ready...]
+Stay tuned for production builds
