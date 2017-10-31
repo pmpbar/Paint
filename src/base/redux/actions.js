@@ -8,8 +8,12 @@ function makeActionCreator(type, ...argNames) {
   };
 }
 
+export const SET_IPC = 'SET_IPC';
 export const SET_TOOL = 'SET_TOOL';
-export const SET_DSC = 'SET_DSC';
+export const SET_STROKE = 'SET_STROKE';
+export const SET_FILL = 'SET_FILL';
 
+export const setIPC = makeActionCreator(SET_IPC, 'ipc');
 export const setTool = makeActionCreator(SET_TOOL, 'tool');
-export const setDrawStackCmd = makeActionCreator(SET_DSC, 'drawStackCmd');
+export const setStroke = makeActionCreator(SET_STROKE, 'stroke');
+export const setFill = makeActionCreator(SET_FILL, 'fill');

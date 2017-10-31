@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import p5 from 'p5';
-import { actionValidator, toolValidator, dSCValidator } from 'base/redux/validators';
+import { actionValidator, toolValidator, colorValidator } from 'base/redux/validators';
 
 export default class Canvas extends Component {
   static propTypes = {
     tool: toolValidator.isRequired,
-    drawStackCmd: dSCValidator.isRequired,
-    setDrawStackCmd: actionValidator.isRequired,
+    stroke: colorValidator.isRequired,
+    fill: colorValidator.isRequired,
+    setTool: actionValidator.isRequired,
+    setIPC: actionValidator.isRequired,
   }
   constructor(props) {
     super(props);
@@ -18,9 +20,13 @@ export default class Canvas extends Component {
   }
 
   componentDidMount() {
-    this.canvasProps = {
-      rotation: 0,
-    };
+    const { ipcRenderer } = window.require('electron');
+    this.handleOSEvents(ipcRenderer);
+    this.props.setIPC(ipcRenderer);
+
+    document.addEventListener('pointerlockchange', (e) => {
+      console.log(e);
+    }, false);
 
     this.p5 = new p5((p) => {
       p.setup = () => {
@@ -47,11 +53,14 @@ export default class Canvas extends Component {
               break;
           }
         }
-        this.p5.stroke(0);
         this.p5.strokeWeight(4);
-        this.p5.noFill();
         for (let i = 0; i < this.drawing.length; i += 1) {
           const path = this.drawing[i];
+          this.p5.stroke(path.stroke);
+          this.p5.noFill();
+          if (path.fill) {
+            this.p5.fill(path.fill);
+          }
           this.p5.beginShape();
           switch (path.type) {
             case 'line':
@@ -70,11 +79,6 @@ export default class Canvas extends Component {
         }
       };
     }, this.wrapper);
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.drawStackCmd !== this.props.drawStackCmd) {
-      this.executeDSC(nextProps.drawStackCmd);
-    }
   }
 
   drawLine = () => {
@@ -111,12 +115,16 @@ export default class Canvas extends Component {
 
   startPath = () => {
     this.isDrawing = true;
-    const { tool } = this.props;
+    const { tool, stroke, fill } = this.props;
     this.currentPath = {
       type: tool,
       data: [],
+      stroke,
+      fill,
     };
     this.drawing.push(this.currentPath);
+    this.wrapper.requestPointerLock();
+    // document.exitPointerLock();
   }
 
   endPath = () => {
@@ -141,10 +149,53 @@ export default class Canvas extends Component {
       default:
         break;
     }
-    this.props.setDrawStackCmd('');
+  }
+
+  handleOSEvents = (ipc) => {
+    ipc.on('redux-sync', (e, update) => {
+      console.log(update);
+      if (update.cmd === 'setStroke') {
+        this.props.setStroke(update.data);
+      }
+    });
+    ipc.on('change-tool', (e, tool) => {
+      this.props.setTool(tool);
+    });
+    ipc.on('draw-stack-cmd', (e, cmd) => {
+      this.executeDSC(cmd);
+    });
+    ipc.on('file-cmd', (e, req) => {
+      switch (req.cmd) {
+        case 'new':
+          document.title = `Paint - Untitled`;
+          this.drawing = [];
+          this.history = [];
+          break;
+        case 'save':
+          ipc.send('file-cmd-res', {
+            cmd: req.cmd,
+            file: req.file,
+            data: {
+              drawing: this.drawing,
+              history: this.history,
+            },
+          });
+          break;
+        case 'open':
+          document.title = `Paint - ${req.file.split('.')[0]}`;
+          this.drawing = req.data.drawing;
+          this.history = req.data.history;
+          break;
+        case 'export':
+          this.p5.save();
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   render() {
-    return <div ref={(wrapper) => { this.wrapper = wrapper; }} />;
+    return <div className="canvas" ref={(wrapper) => { this.wrapper = wrapper; }} />;
   }
 }

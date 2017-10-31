@@ -1,6 +1,78 @@
+const { dialog } = require('electron');
+const fs = require('fs');
+const path = require('path');
+
 module.exports = {
-  menuTemplate: (app, mainWindow) => {
+  menuTemplate: (app, mainWindow, createColorWindow) => {
     const template = [
+      {
+        label: 'File',
+        submenu: [
+          {
+            label: 'New',
+            accelerator: 'CmdOrCtrl+N',
+            click() {
+              global.openFile = null;
+              mainWindow.webContents.send('file-cmd', { cmd: 'new', file: 'Untitled.paint' });
+            },
+          },
+          {
+            label: 'Open',
+            accelerator: 'CmdOrCtrl+O',
+            click() {
+              const file = dialog.showOpenDialog(mainWindow, {
+                filters: [
+                  { name: 'MacPaintFiles', extensions: ['paint'] },
+                ],
+                properties: ['openFile'],
+              });
+
+              if (file) {
+                fs.readFile(file[0], (err, d) => {
+                  const data = JSON.parse(d);
+                  if (data.drawing) {
+                    const fileName = path.basename(file[0]);
+                    mainWindow.webContents.send('file-cmd', { cmd: 'open', data, file: fileName });
+                    global.openFile = file[0];
+                  } else {
+                    let message = "An error occured";
+                    if (err) {
+                      message = err;
+                    }
+                    dialog.showMessageBox({
+                      type: 'error',
+                      message,
+                    });
+                  }
+                });
+              }
+            },
+          },
+          {
+            label: 'Save',
+            accelerator: 'CmdOrCtrl+S',
+            click() {
+              let file = global.openFile;
+              if (file === null) {
+                file = dialog.showSaveDialog(mainWindow, {
+                  filters: [
+                    { name: 'MacPaintFiles', extensions: ['paint'] },
+                  ],
+                });
+              }
+              if (file) {
+                mainWindow.webContents.send('file-cmd', { cmd: 'save', file });
+              }
+            },
+          },
+          {
+            label: 'Export',
+            click() {
+              mainWindow.webContents.send('file-cmd', { cmd: 'export' });
+            },
+          },
+        ],
+      },
       {
         label: 'Edit',
         submenu: [
@@ -30,6 +102,12 @@ module.exports = {
       {
         label: 'Tools',
         submenu: [
+          {
+            label: 'Color Picker',
+            click() {
+              createColorWindow();
+            },
+          },
           {
             label: 'Line',
             accelerator: 'l',
@@ -86,7 +164,7 @@ module.exports = {
       });
 
       // Edit menu
-      template[1].submenu.push(
+      template[2].submenu.push(
         { type: 'separator' },
         {
           label: 'Speech',
@@ -98,7 +176,7 @@ module.exports = {
       );
 
       // Window menu
-      template[3].submenu = [
+      template[4].submenu = [
         { role: 'close' },
         { role: 'minimize' },
         { role: 'zoom' },

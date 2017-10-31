@@ -1,27 +1,37 @@
-import { SET_TOOL, SET_DSC } from 'base/redux/actions';
+import { SET_TOOL, SET_STROKE, SET_FILL, SET_IPC } from 'base/redux/actions';
 /**
  * Base reducers
  */
-const defaultState = {
+export const initalState = {
   tool: 'line',
-  drawStackCmd: '',
+  stroke: '#000000',
+  fill: '',
+  ipc: {},
 };
 
-const base = (state = defaultState, action) => {
+export const reducer = (state = initalState, action) => {
   switch (action.type) {
+    case SET_IPC:
+      return {
+        ...state,
+        ipc: action.ipc,
+      };
     case SET_TOOL:
       return {
         ...state,
         tool: action.tool,
       };
-    case SET_DSC:
+    case SET_STROKE:
       return {
         ...state,
-        drawStackCmd: action.drawStackCmd,
+        stroke: action.stroke,
+      };
+    case SET_FILL:
+      return {
+        ...state,
+        fill: action.fill,
       };
     default:
       return state;
   }
 };
-
-export default base;
