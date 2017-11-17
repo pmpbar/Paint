@@ -24,9 +24,9 @@ export default class Canvas extends Component {
     this.handleOSEvents(ipcRenderer);
     this.props.setIPC(ipcRenderer);
 
-    document.addEventListener('pointerlockchange', (e) => {
+    /* document.addEventListener('pointerlockchange', (e) => {
       console.log(e);
-    }, false);
+    }, false); */
 
     this.p5 = new p5((p) => {
       p.setup = () => {
@@ -123,7 +123,7 @@ export default class Canvas extends Component {
       fill,
     };
     this.drawing.push(this.currentPath);
-    this.wrapper.requestPointerLock();
+    // this.wrapper.requestPointerLock();
     // document.exitPointerLock();
   }
 
