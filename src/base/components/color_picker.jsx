@@ -13,6 +13,7 @@ export default class ColorPicker extends Component {
   componentDidMount() {
     const { ipcRenderer } = window.require('electron');
     // ipcRenderer.send('redux-sync', { window:'main', cmd: 'setStroke', data:  });
+    document.title = `Set Fill`;
     ipcRenderer.on('redux-sync', (e, update) => {
       console.log(update);
     });

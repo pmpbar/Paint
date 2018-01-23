@@ -122,6 +122,13 @@ module.exports = {
               mainWindow.webContents.send('change-tool', 'circle');
             },
           },
+          {
+            label: 'Rectangle',
+            accelerator: 'r',
+            click() {
+              mainWindow.webContents.send('change-tool', 'rectangle');
+            },
+          },
         ],
       },
       {

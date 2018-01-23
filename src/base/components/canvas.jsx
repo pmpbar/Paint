@@ -49,6 +49,9 @@ export default class Canvas extends Component {
             case 'circle':
               this.drawCircle();
               break;
+            case 'rectangle':
+              this.drawRectangle();
+              break;
             default:
               break;
           }
@@ -96,6 +99,23 @@ export default class Canvas extends Component {
     }
   }
   drawCircle = () => {
+    if (this.currentPath.data.x) {
+      const origin = { x: this.currentPath.data.x, y: this.currentPath.data.y };
+      const x = this.p5.mouseX;
+      const y = this.p5.mouseY;
+      const radius = Math.sqrt(((origin.x - x) ** 2) + ((origin.y - y) ** 2));
+      this.currentPath.data.r1 = radius;
+      this.currentPath.data.r2 = radius;
+    } else {
+      this.currentPath.data = {
+        x: this.p5.mouseX,
+        y: this.p5.mouseY,
+        r1: 1,
+        r2: 1,
+      };
+    }
+  }
+  drawRectangle = () => {
     if (this.currentPath.data.x) {
       const origin = { x: this.currentPath.data.x, y: this.currentPath.data.y };
       const x = this.p5.mouseX;

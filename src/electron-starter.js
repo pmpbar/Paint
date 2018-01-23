@@ -11,14 +11,14 @@ global.openFile = null;
 
 const createColorWindow = () => {
   // Create the browser window.
-  colorWindow = new BrowserWindow({ parent: mainWindow, width: 300, height: 600 });
+  colorWindow = new BrowserWindow({ parent: mainWindow, width: 245, height: 90 });
 
   // and load the index.html of the app.
   colorWindow.loadURL("http://localhost:3000/colorpicker");
   // mainWindow.loadURL(`file://${__dirname}/public/index.html`);
 
   // Open the DevTools.
-  colorWindow.webContents.openDevTools();
+  // colorWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   colorWindow.on('closed',  () => {
